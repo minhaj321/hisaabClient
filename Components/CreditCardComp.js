@@ -10,7 +10,7 @@ const CreditCardComp = ({name,amt,date,handleDelete,id,handleEdit})=>{
 
     return(
 <View
-style={{width:'94%',marginHorizontal:'3%',backgroundColor:'#fdfdfd',borderRadius:10,height:hp(13),flexDirection:'row',elevation:hp(1),marginTop:hp(2)}}
+style={{width:'94%',marginHorizontal:'3%',backgroundColor:'#fdfdfd',borderRadius:10,height:hp(13),flexDirection:'row',elevation:hp(1),marginTop:hp(1),marginBottom:hp(1)}}
 >
     <View style={styles.creditCardTxtDiv}>
 <Text style={styles.creditName}>{name}</Text>

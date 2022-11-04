@@ -85,21 +85,26 @@ const Home = () => {
   return (
     <View
     style={{backgroundColor:'#fdfdfd',height:'100%'}}>
-            <AlertComp  handler={handler} show={show} type={type} />
+            {/* <AlertComp  handler={handler} show={show} type={type} /> */}
     <ZStack style={{height:'100%'}}>
     <ScrollView 
 showsVerticalScrollIndicator={false}
 height={hp(100)}
 style={{width:wp(100),marginHorizontal:wp(0),marginTop:hp(0)}}>
     <ImageBackground source={HomeBg} style={{height:hp(25),width:wp(100),marginTop:hp(-5),marginBottom:hp(-2),paddingTop:hp(5),flexDirection:'row',transform:[{scaleY:0.8}]}}>
-<View style={{width:wp(5),marginLeft:wp(5),marginTop:hp(2)}}>
+<View style={{width:wp(10),marginLeft:wp(5),marginTop:hp(2)}}>
 <Pressable onPress={()=>setOpen(true)  }>
     <MenuIcon />
 </Pressable>
 </View>
-<View style={{alignItems:'center',width:wp(80),height:'100%',justifyContent:'center'}}>
+<View style={{alignItems:'center',width:wp(70),height:'100%',justifyContent:'center'}}>
 <Text style={{color:'#fff',fontSize:wp(8),letterSpacing:2}}>HISAAB</Text>
 <View style={{width:wp(15),height:hp(0.5),backgroundColor:'#fff',marginTop:hp(2)}}></View>
+</View>
+<View style={{height:wp(10),width:wp(10)}}>
+    <Pressable style={{height:'100%',width:'100%'}} onPress={dataFetching}>
+    <Image  style={{maxHeight:wp(10),maxWidth:wp(10),minHeight:wp(10),minWidth:wp(10),borderRadius:wp(50),resizeMode:'contain'}} source={require('./../assets/refresh.png')} />
+    </Pressable>
 </View>
 </ImageBackground>
 
@@ -144,7 +149,7 @@ style={{width:wp(100),marginHorizontal:wp(0),marginTop:hp(0)}}>
 </View>
 
 <Text style={styles.title}>Daily</Text>
-<View style={{flexDirection:'row',justifyContent:'space-between'}}>
+<View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:hp(2)}}>
 
 <View style={{alignItems:'center'}}>
     <ImageBackground source={CircleImg} style={styles.expected}>

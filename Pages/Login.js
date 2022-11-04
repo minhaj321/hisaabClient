@@ -55,6 +55,8 @@ const Login = ({navigation}) => {
             setType('success')
             await AsyncStorage.setItem('userId',data.message.profile._id);
             await AsyncStorage.setItem('userInstanceId',data.message.userId);
+            await AsyncStorage.setItem('userName',data.message.fName +data.message.lName);
+            await AsyncStorage.setItem('email',data.message.email);
             navigation.navigate('Home')
         }else if(data.status==403){
             setType('success')

@@ -36,7 +36,7 @@ const DailyExpense = () => {
 
     const fetching =async()=>{
         try{
-            setShow(true)
+            // setShow(true)
             setAlertType('load')
             var userId =await AsyncStorage.getItem('userId');
             console.log(userId)
@@ -45,7 +45,8 @@ const DailyExpense = () => {
                 date:moment().format('YYYY-MM-DD')
             })
             if(data.status==200){
-                setShow(false)
+            setAlertType('success')
+            setShow(false)
                 setDailyData(data.message)
             }else{
                 setAlertType('error')

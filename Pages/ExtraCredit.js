@@ -36,15 +36,16 @@ const ExtraCredit = () => {
     },[])
 
     const fetching= async()=>{
-        setShow(true)
-        setType('load')
         try{
+            setShow(true)
+            setType('load')
         var userId = await AsyncStorage.getItem('userId') 
         var {data} = await axios.get(dev+'/credit/readCredit/'+userId);
         if(data.status==200){
             // get data
         setShow(false)
-        // console.log('success=',data)
+            setType('success')
+            console.log('success=',data)
             setCredits(data.message)
         }else{
         setType('error')
@@ -55,6 +56,9 @@ const ExtraCredit = () => {
         setType('catch')
         console.log('catch=',err.message)
             // error
+        }
+        if(type=='load'){
+            setShow('false')
         }
     }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import {View,Text,Animated,Pressable, Alert,Image} from 'react-native';
 import { widthPercentageToDP as wp , heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Home from './../assets/BlueHome.svg';
@@ -23,6 +23,7 @@ import HistoryWhite from './../assets/WhiteHistory.svg'
 import Group from './../assets/WhiteUser.svg'
 
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 var TranslationX = new Animated.Value(wp(-90));
 var TranslationXHome = new Animated.Value(wp(-90));
@@ -39,9 +40,23 @@ const Sidebar = ({open,setOpen,handleMe}) => {
     var navigation = useNavigation();
 
     var [type,setType] = useState('empty');
+    var [userName,setUserName] = useState('');
+    var [userEmail,setUserEmail] = useState('');
     var [allow,setAllow] = useState(true)
-// animation for home
-    var openHome = Animated.sequence([
+
+    useEffect(()=>{
+        fetching()
+    },[])
+
+    var fetching=async()=>{
+        var userName = await AsyncStorage.getItem('userName')
+        var email = await AsyncStorage.getItem('email')
+        setUserName(userName)
+        setUserEmail(email)
+    }
+
+    // animation for home
+var openHome = Animated.sequence([
         Animated.timing(TranslationXHome,{
             toValue:wp(2),
             duration:400,
@@ -329,6 +344,7 @@ var lst2 = [
         icon:<HomeWhite/>,
         fun:()=>{
             setOpen(false)
+            closeHome.start()
             navigation.navigate('Home')
             // handleAnime('home',openHome)
         },
@@ -346,6 +362,7 @@ var lst2 = [
         name:'Edit Profile',
         icon:<Group/>,
         fun:()=>{
+            closeEdit.start()
             navigation.navigate('EditProfile')
             // handleAnime('edit',openEdit)
     },
@@ -354,7 +371,9 @@ var lst2 = [
     {
         name:'Daily Details',
         icon:<Image source={DailyDetailsWhite} style={{height:20,width:20}}/>,
-        fun:()=>{navigation.navigate('DailyExpense')},
+        fun:()=>{
+            closeDaily.start()
+            navigation.navigate('DailyExpense')},
         styling : { transform:[{translateX:TranslationXDaily}] }
     },
     // {
@@ -370,6 +389,7 @@ var lst2 = [
         name:'Add Credits',
         icon:<Image source={CreditsWhite} style={{height:20,width:20}}/>,
         fun:()=>{
+            closeCredits.start()
             navigation.navigate('ExtraCredit')
     },
         styling : { transform:[{translateX:TranslationXCredits}] }
@@ -378,6 +398,7 @@ var lst2 = [
         name:'History',
         icon:<HistoryWhite/>,
         fun:()=>{
+            closeHistory.start()
             navigation.navigate('History')
     },
         styling : { transform:[{translateX:TranslationXHistory}] }
@@ -475,16 +496,17 @@ const handleAnime = (currentType) =>{
 // handleMe(CloseMenu)
 
 const handleLogOut =async()=>{
-    // var {data} = await axios.put('http://192.168.100.35:5400/user/logout',{
-    //     email:'minhajsohail7@gmail.com'
-    // })
-    // if(data.message=='Success'){
-    //     navigation.navigate('Login')
-    // }else{
-    //     Alert.alert('There is an error in logging you out.')
-    // }
-    // console.log(data)
+    try{
 
+    await AsyncStorage.removeItem('email')
+    await AsyncStorage.removeItem('userName')
+    await AsyncStorage.removeItem('userId')
+    console.log('yes')
+    navigation.navigate('/')
+}
+catch(err){
+    console.log(err.message)
+}
 }
 
     return (
@@ -498,8 +520,8 @@ const handleLogOut =async()=>{
         <View style={{flexDirection:'row'}}>
 
             <View style={{marginLeft:10,justifyContent:'center'}}>
-                <Text style={{fontFamily:'Montserrat',color:'#333333',fontWeight:'700'}}>John</Text>
-                <Text style={{fontFamily:'Montserrat',fontSize:wp(3.5)}}>John123@gmail.com</Text>
+                <Text style={{fontFamily:'Montserrat',color:'#333333',fontWeight:'700'}}>{userName}</Text>
+                <Text style={{fontFamily:'Montserrat',fontSize:wp(3.5)}}>{userEmail}</Text>
             </View>
 
         </View>

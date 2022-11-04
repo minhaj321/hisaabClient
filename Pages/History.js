@@ -24,26 +24,11 @@ const History = () => {
     const [date,setDate]=useState(moment().format('YYYY-MM-DD'))
     const [type,setType] = useState('')
     const [show,setShow] = useState(false)
+    const [monthlyList,setMonthlyList] = useState([])
+    const [dailyList,setDailyList] = useState([])
     
-    var monthlyList=[
-        {name:'Transport',expected:'4,000',spended:'3,720'},
-        {name:'Flour',expected:'15,000',spended:'12,100'},
-        {name:'Rice',expected:'10,000',spended:'8,000'},
-        {name:'Refreshments',expected:'6,000',spended:'6,040'},
-        {name:'Refreshments',expected:'6,000',spended:'6,040'},
-        {name:'Refreshments',expected:'6,000',spended:'6,040'},
-        {name:'Refreshments',expected:'6,000',spended:'6,040'},
-    ]
 
-    var dailyList=[
-        {name:'Transport',expected:'400',spended:'320'},
-        {name:'Flour',expected:'1500',spended:'1200'},
-        {name:'Rice',expected:'1000',spended:'800'},
-        {name:'Refreshments',expected:'600',spended:'640'},
-        {name:'Refreshments',expected:'600',spended:'640'},
-        {name:'Refreshments',expected:'600',spended:'640'},
-        {name:'Refreshments',expected:'600',spended:'640'},
-    ]
+
 
 
     var monthlyData={name:'Monthly Expense',expected:'40,000',spended:'33,720'};
@@ -58,29 +43,35 @@ const History = () => {
                 date:date,
                 userId
             })
-            if(date.status==200){
-        setShow(false)
+            if(data.status==200){
+                console.log("successed 1 ",data.message)
+                setDailyList(data.message)
+                setShow(false)
         setShow(true)
         setType('load')
-        var StartDate =moment(date).subtract(1,'month').format('YYYY-MM-DD');
-                var {data} = await axios.post(dev+'/daily/readMonthly',{
-                userId,
-                StartDate,
-                EndDate:date
-                })
-                if(data.status==200){
-                    setShow(false)
-
-                }else{
-        setType('error')
-
-                }
             }else{
-        setType('error')
+                    console.log("error 2 ",data.message)
+                    setType('error')
+            }
+            var StartDate =moment(date).subtract(1,'month').format('YYYY-MM-DD');
+            var {data} = await axios.post(dev+'/daily/readMonthly',{
+            userId,
+            StartDate,
+            EndDate:date
+            })
+            if(data.status==200){
+                setShow(false)
+                setMonthlyList(data.message)
+                console.log("successed 2 ",data.message)
+
+            }else{
+                console.log("error 1 ",data.message)
+                setType('error')
 
             }
         }catch(err){
-        setType('catch')
+                    console.log("catch ",err.message)
+                    setType('catch')
         // error
         }
 
