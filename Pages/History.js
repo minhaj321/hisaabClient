@@ -12,6 +12,7 @@ import axios from 'axios';
 import { dev } from '../Connections/endPoint';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ExpenseCard from './../Components/ExpenseCard.js';
+import AlertComp from './../Components/AlertComp';
 
 
 const History = () => {
@@ -21,6 +22,8 @@ const History = () => {
     const [showMonth, setShowMonth] = useState(false);
     const [showDay, setShowDay] = useState(false);
     const [date,setDate]=useState(moment().format('YYYY-MM-DD'))
+    const [type,setType] = useState('')
+    const [show,setShow] = useState(false)
     
     var monthlyList=[
         {name:'Transport',expected:'4,000',spended:'3,720'},
@@ -47,30 +50,48 @@ const History = () => {
     var dailyData={name:'Monthly Expense',expected:'1,000',spended:'600'};
 
     const handleSearch=async()=>{
-
+        setShow(true)
+        setType('load')
         try{
             var userId = await AsyncStorage.getItem('userId')
             var {data} = await axios.post(dev+'/daily/readDaily',{
-                date:date.split('T')[0],
+                date:date,
                 userId
             })
             if(date.status==200){
-                var StartDate = moment(date).subtract('month',1).format('YYYY-MM-DD');
-                console.log(StartDate)
+        setShow(false)
+        setShow(true)
+        setType('load')
+        var StartDate =moment(date).subtract(1,'month').format('YYYY-MM-DD');
                 var {data} = await axios.post(dev+'/daily/readMonthly',{
                 userId,
                 StartDate,
-                EndDate:date.split('T')[0]
+                EndDate:date
                 })
+                if(data.status==200){
+                    setShow(false)
+
+                }else{
+        setType('error')
+
+                }
+            }else{
+        setType('error')
+
             }
         }catch(err){
-            // error
+        setType('catch')
+        // error
         }
 
     }
 
+    const handler = ()=>{
+        setShow(false)
+    }
 return (
 <ScrollView style={{backgroundColor:'#fdfdfd',height:hp(100),marginBottom:hp(0)}}>
+            <AlertComp  handler={handler} show={show} type={type} />
         <Header title={'History'} />
         <DateInput getDate={setDate} focus={focused3} setFocus={setFocused3} 
         />

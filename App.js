@@ -30,20 +30,17 @@ const App= ()  => {
       <Stack.Navigator screenOptions={{headerShown:false}}>
 
         {/* PROFILE */}
-        <Stack.Screen name="/" component={Home} />
+        <Stack.Screen name="/" component={Login} />
         <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="ExtraCredit" component={ExtraCredit} />
+        <Stack.Screen name="DailyExpense" component={DailyExpense} />
         <Stack.Screen name="VerifyAccount" component={VerifyAccount} />
         <Stack.Screen name="ResetPassword" component={ResetPassword} />
         <Stack.Screen name="EmailForForget" component={EmailForForget} />
         <Stack.Screen name="CodeOfReset" component={CodeOfReset} />
         <Stack.Screen name="ProfileBuilding" component={ProfileBuilding} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
-
-{/* working */}
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="ExtraCredit" component={ExtraCredit} />
-
-        <Stack.Screen name="DailyExpense" component={DailyExpense} />
 
         <Stack.Screen name="History" component={History} />
         

@@ -14,6 +14,7 @@ import axios from 'axios';
 import { dev } from '../Connections/endPoint';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import AlertComp from './../Components/AlertComp';
 import { useIsFocused } from '@react-navigation/native';
 
 const Home = () => {
@@ -26,22 +27,23 @@ const Home = () => {
     const [currentBalance,setCurrentBalance]= useState(0)
     const [daily,setDaily]= useState(0)
     const [dailyExp,setDailyExp]= useState(0)
-
+    const [type,setType] = useState('')
+    const [show,setShow] = useState(false)
     
     var dataFetching = async()=>{
         try{
+            setShow(true)
+            setType('load')
             var startDate=moment().format('YYYY-MM-DD')
             var endDate=moment().subtract('month',1).format('YYYY-MM-DD')
            var userId = await AsyncStorage.getItem('userId');
-           console.log(startDate)
-           console.log(endDate)
         var {data}  = await axios.post(dev+'/user/currentBalance',{
             userId,
             startDate,
             endDate,
         })
         if(data.status==200){
-            console.log(data.message)
+            setType('success')
             setMonthly(data.message.monthlySpend);
             setDaily(data.message.dailySpend);
             setCurrentBalance(data.message.currentBalance);
@@ -49,21 +51,25 @@ const Home = () => {
             setMonthlyExp(data.message.monthlyExpected)
             setDailyExp(data.message.dailyExpected)
             // handleData
+        }else{
+            setType(data.message)
+            console.log('error',data.status)
         }
         }catch(err){
+            setType('catch')
             // error
             console.log(err.message)
         }
     }
 
 
-    if(isFocused){
+    // if(isFocused && salary==0){
+    //     console.log('ues')
+    // }
+    
+    useEffect(()=>{
         dataFetching()
-        // console.log('ues')
-    }
-
-    // useEffect(()=>{
-    // },[])
+    },[])
 
     const handleMe=(anime)=>{
         setTimeout(()=>{
@@ -72,9 +78,14 @@ const Home = () => {
     anime.start();
     }
 
+    const handler = ()=>{
+        setShow(false)
+    }
+
   return (
     <View
     style={{backgroundColor:'#fdfdfd',height:'100%'}}>
+            <AlertComp  handler={handler} show={show} type={type} />
     <ZStack style={{height:'100%'}}>
     <ScrollView 
 showsVerticalScrollIndicator={false}

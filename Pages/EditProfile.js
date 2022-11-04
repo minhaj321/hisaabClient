@@ -15,6 +15,7 @@ import Woman4 from './../assets/woman4.png'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { dev } from '../Connections/endPoint.js';
+import AlertComp from './../Components/AlertComp';
 
 const EditProfile = ({navigation}) => {
 
@@ -31,6 +32,8 @@ const EditProfile = ({navigation}) => {
     const [male, setMale] = useState(true);
     const [salaryDate,setSalaryDate] = useState(1)
     const [startDate,setStartDate] = useState(10)
+    const [type,setType] = useState('')
+    const [show,setShow] = useState(false)
     const [render,setRender]= useState([
         {icon:Man1},
         {icon:Man2},
@@ -55,12 +58,17 @@ const EditProfile = ({navigation}) => {
     var arr = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 
     const handleProfile = async()=>{
+        setShow(true)
+        setType('load')
+        try{
+
         var dob=day+'/'+month+'/'+year;
         var userId = await AsyncStorage.getItem('userInstanceId')
-        console.log(userId)
         var {data} = await axios.post(dev+'/user/editProfile',{
             gender:male?'male':'female',
             salary,
+            fname:fName,
+            lname:lName,
             startingOfMonth:startDate,
             dateOfSalary:salaryDate,
             profilePic:profile,
@@ -68,15 +76,26 @@ const EditProfile = ({navigation}) => {
             userId
         }) 
         if(data.status==200){
-            navigation.navigate('Home')
+        setShow(false)
+        navigation.navigate('Home')
     }else{
-            console.log("error",data.status)
+                setType('error')
+                console.log("error",data.status)
     }
-    }
+}catch(err){
+    setType('catch')
+            
+}
 
+}
+
+    const handler = ()=>{
+        setShow(false)
+    }
   return (
     <ScrollView style={styles.editMain}>
         <Header title={'Edit Profile'} />
+            <AlertComp  handler={handler} show={show} type={type} />
         <Text style={styles.extraTxt}>First Name</Text>
         <InputComp focus={focused1} setFocus={setFocused1} val={fName} setVal={setFName}  />
 

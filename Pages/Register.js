@@ -8,6 +8,7 @@ import BlackInput from './../assets/beforeInput.png'
 import WhiteInput from './../assets/blueInput.png'
 import Usericon from './../assets/usericon.svg'
 import MsgIcon from './../assets/Message.svg';
+import AlertComp from './../Components/AlertComp';
 import { dev } from '../Connections/endPoint';
 import axios from 'axios';
 
@@ -20,8 +21,8 @@ const Register = ({navigation}) => {
     const [password,setPassword] = useState('')
     const [confPassword,setConfPassword] = useState('')
     var [pass,showPass] = useState(true)
-
-
+    const [type,setType] = useState('')
+    const [show,setShow] = useState(false)
 
     const [focused1, setFocused1] = useState(false);
     const [focused2, setFocused2] = useState(false);
@@ -30,21 +31,28 @@ const Register = ({navigation}) => {
     const [focused5, setFocused5] = useState(false);
 
 const handleRegister = async()=>{
+    setShow(true)
+    setType('load')
 
     try{
         if(lname==''){
+            setType('error')
             console.log('lname')
             return
         }else if(fname==''){
+            setType('error')
             console.log('fname')
             return
         }else if(email==''){
+            setType('email')
             console.log('email')
             return            
         }else if(password==''){
+            setType('password')
             console.log('password')
             return
         }else if(password!=confPassword){
+            setType('error')
             console.log('not equal')
             return
         }
@@ -53,15 +61,18 @@ const handleRegister = async()=>{
         lname,fname,password,email
     })
     if(data.status==200){
-        navigation.navigate('VerifyAccount',{
+            setType('success')
+            navigation.navigate('VerifyAccount',{
             email:data.message.email,
         })
     }else{
-        console.log("error",data.message)
+            setType(data.message)
+            console.log("error",data.message)
         // else error
     }
 }catch(err){
-        console.log("error",err.message)
+            setType('catch')
+            console.log("error",err.message)
         // catch error
 }
 
@@ -71,6 +82,7 @@ const handleRegister = async()=>{
     <KeyboardAvoidingView
     behavior='position'
      style={{backgroundColor:'#fdfdfd',height:'100%'}}>
+            <AlertComp  handler={handler} show={show} type={type} />
 <ImageBackground source={HomeBg} style={{height:hp(25),width:wp(100),marginTop:hp(-5),marginBottom:hp(-2),transform:[{scaleY:0.8}]}} >
 <View style={{alignItems:'center',height:'100%',justifyContent:'center'}}>
 <Text style={{color:'#fff',fontSize:wp(8),letterSpacing:2}}>HISAAB</Text>

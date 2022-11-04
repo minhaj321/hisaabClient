@@ -8,43 +8,59 @@ import { TextInput } from 'react-native';
 import { useState } from 'react';
 import { dev } from '../Connections/endPoint';
 import axios from 'axios'
+import AlertComp from './../Components/AlertComp';
 
 const ResetPassword = ({navigation,route}) => {
 
         var {email} = route.params;
         const [password,setPass] = useState('')
         const [confPassword,setConfPass] = useState('')
+        const [type,setType] = useState('')
+        const [show,setShow] = useState(false)
 
         const handleApi = async()=>{
                 try{
+                        setShow(true)
+                        setType('load')
                         if(password==''){
                                 // error password
-                                return;
+                        setType('password')
+                        return;
                         }
                        else if(password!=confPassword){
-                                //erorr
+                        setType('incPass')
+                        //erorr
                                 return;
                         }
                 var {data} = await axios.post(dev+'/user/resetPassword',{
                         email,password
                 })
-                console.log(data)
                 if(data.status==200){
+                        setShow(false)
                         navigation.navigate('/')
             
                     }else{
                 // error
-                console.log('error',data.status)
+                        setType('error')
+                        console.log('error',data.status)
                     }
         }
         catch(err){
+                setType('catch')
                 // error
         }
         }
 
+
+        const handler = ()=>{
+                setShow(false)
+            }
+
+
     return (
         <KeyboardAvoidingView
         behavior='position'style={{height:hp(100),backgroundColor:'#fdfdfd'}}>
+            <AlertComp  handler={handler} show={show} type={type} />
         <Header title={'Reset Password'} />
         <View style={{marginTop:hp(15)}}>
             <Text style={{color:'#333333',textAlign:'center',paddingHorizontal:wp(12),fontSize:wp(4.5)}}>You can change your password.</Text>

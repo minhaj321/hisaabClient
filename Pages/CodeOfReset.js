@@ -7,38 +7,51 @@ import WhiteInput from './../assets/blueInput.png'
 import { TextInput } from 'react-native';
 import { dev } from '../Connections/endPoint';
 import axios from 'axios';
+import AlertComp from './../Components/AlertComp';
 
 const CodeOfReset = ({navigation,route}) => {
 
         var {email} = route.params;
         const [code,setCode] = useState(0)
+        const [type,setType] = useState('')
+        const [show,setShow] = useState(false)
 
         const handleCode = async()=>{
+                setShow(true)
+                setType('load')
                 try{
                         console.log(email)
                         if(code==0){
-                        // error email
+                setType('code')
+                // error email
                                 return
                         }
                 var {data} = await axios.post(dev+'/user/checkCode',{
                         code,email
                 })
                 if(data.status==200){
-                        navigation.navigate('ResetPassword',{
+                setShow(false)
+                navigation.navigate('ResetPassword',{
                                 email
                         })
                 }else{
                 // error else
-                        console.log("error",data.status)
+                setType('error')
+                console.log("error",data.status)
                 }
         }catch(err){
+                setType('catch')
                 // error catch
         }
         }
 
+        const handler = ()=>{
+                setShow(false)
+            }
     return (
         <KeyboardAvoidingView
         behavior='position'style={{height:hp(100),backgroundColor:'#fdfdfd'}}>
+            <AlertComp  handler={handler} show={show} type={type} />
         <Header title={'Verify Email'} />
         <View style={{marginTop:hp(15)}}>
             <Text style={{color:'#333333',textAlign:'center',paddingHorizontal:wp(12),fontSize:wp(4.5)}}>We have send you a code on your email {email}. Please check it.</Text>

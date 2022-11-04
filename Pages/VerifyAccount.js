@@ -7,14 +7,22 @@ import BlackInput from './../assets/beforeInput.png'
 import WhiteInput from './../assets/blueInput.png'
 import axios from 'axios';
 import { dev } from '../Connections/endPoint.js';
+import AlertComp from './../Components/AlertComp';
 
 const VerifyAccount = ({navigation,route}) => {
 
  const [code,setCode] = useState(0)
-        var {email} = route.params;
+ const [type,setType] = useState('')
+ const [show,setShow] = useState(false)
+
+var {email} = route.params;
+
         const handleApi=async()=>{
+                setShow(true)
+                setType('load')
                 try{
                 if(code==0){
+                setType('code')
                 // error catch               
                 return;
                 }
@@ -22,24 +30,32 @@ const VerifyAccount = ({navigation,route}) => {
                         code,email
                 })
                 if(data.status==200){
-                        console.log('verified')
+                setShow(false)
+                console.log('verified')
                         navigation.navigate('ProfileBuilding',{
                                 userId:data.message._id
                         })
                 }else{
         // error else               
-        console.log('err=>',data.status)
+                setType('error')
+                console.log('err=>',data.status)
                 }
 
         }catch(err){
-        console.log('err=>',err.message)
+                setType('catch')
+                console.log('err=>',err.message)
         // error catch               
         }
         }
 
+        const handler = ()=>{
+                setShow(false)
+            }
+
         return (
         <KeyboardAvoidingView
         behavior='position'style={{height:hp(100),backgroundColor:'#fdfdfd'}}>
+            <AlertComp  handler={handler} show={show} type={type} />
         <Header title={'Verify Account'} />
         <View style={{marginTop:hp(15)}}>
             <Text style={{color:'#333333',textAlign:'center',paddingHorizontal:wp(12),fontSize:wp(4.5)}}>We have send you a code on your email {email}. Please check it.</Text>

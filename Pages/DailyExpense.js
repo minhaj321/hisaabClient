@@ -10,6 +10,7 @@ import { dev } from '../Connections/endPoint';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EditModal from './../Components/EditModal.js';
 import moment from 'moment';
+import AlertComp from './../Components/AlertComp';
 
 const DailyExpense = () => {
 
@@ -26,6 +27,8 @@ const DailyExpense = () => {
     const [updatingAmt,setUpdatingAmt] = useState(0);
     const [prevAmt,setPrevAmt] = useState(0);
     const [open,setOpen] = useState(false) 
+    const [alertType,setAlertType] = useState('')
+    const [show,setShow] = useState(false)
 
     useEffect(()=>{
         fetching();
@@ -33,8 +36,8 @@ const DailyExpense = () => {
 
     const fetching =async()=>{
         try{
-            // var formatted = moment().set('year',year).set('date',day).set('months',1).format('YYYY-MM-DD')
-            // console.log(formatted)
+            setShow(true)
+            setAlertType('load')
             var userId =await AsyncStorage.getItem('userId');
             console.log(userId)
             var {data} = await axios.post(dev+'/daily/readDaily',{
@@ -42,29 +45,22 @@ const DailyExpense = () => {
                 date:moment().format('YYYY-MM-DD')
             })
             if(data.status==200){
-                console.log('get fetched ',data.message)
+                setShow(false)
                 setDailyData(data.message)
             }else{
-                console.log('error ',data)
+                setAlertType('error')
+            console.log('error ',data)
             }
         }catch(err){
+            setAlertType('catch')
             console.log('catch ',err.message)
         }
     }
 
-    var data=[
-        {name:'Health Allowance',amt:'4,000'},
-        {name:'Birthday',amt:'300'},
-        {name:'Fuel Allowance',amt:'15,000'},
-        {name:'Birthday',amt:'300'},
-        {name:'Fuel Allowance',amt:'15,000'},
-        {name:'Health Allowance',amt:'4,000'},
-        {name:'Fuel Allowance',amt:'15,000'},
-    ]
-
     const handleExpected=async()=>{
         try{
-
+            setShow(true)
+            setAlertType('load')
         if(creditName=='' || creditAmt==0){
             Alert.alert('Fill form first')
         }else{
@@ -77,15 +73,16 @@ const DailyExpense = () => {
             })
             if(data.status==200){
                 // 
-                fetching()
-                console.log('fetched ',data.message)
+            setShow(false)
+            fetching()
             }else{
-                console.log('error')
-                console.log(data.message)
+            setAlertType('error')
+            console.log(data.message)
             }
         }
     }catch(err){
-        console.log('catch ',err.message)
+            setAlertType('catch')
+            console.log('catch ',err.message)
     }
 
     }
@@ -93,23 +90,30 @@ const DailyExpense = () => {
 
     const handleDelete=async(id,amount)=>{
         try{
+            setShow(true)
+            setAlertType('load')
             var {data} =  await axios.post(dev+'/daily/DeleteDaily',{
                 id,amount
             })
             if(data.status==200){
             console.log('success  ',data.message)
+            setShow(false)
             fetching();
             }else{
+            setAlertType('error')
             console.log('error  ',data.message)
             }
         }catch(err){
             // error
+            setAlertType('catch')
             console.log('error catch ',err.message)
         }
     }
 
     const  editSpendHandler=async()=>{
         try{
+            setShow(true)
+            setAlertType('load')
             var {data} =  await axios.post(dev+'/daily/EditDailySpendeded',{
                 id:updatingId,
                 prevAmt:prevAmt,
@@ -117,14 +121,17 @@ const DailyExpense = () => {
                 name:editName
             })
             if(data.status==200){
-                fetching()
+            setShow(false)
+            fetching()
                 console.log('success ',data.message)
             }else{
                 // error
-                console.log('error ',data.message)
+            setAlertType('error')
+            console.log('error ',data.message)
             }
         }catch(err){
             // error
+            setAlertType('catch')
             console.log('error catch ',err.message)
         }
     }
@@ -132,20 +139,25 @@ const DailyExpense = () => {
     
     const  editExpecteddHandler=async()=>{
         try{
+            setShow(true)
+            setAlertType('load')
             var {data} =  await axios.post(dev+'/daily/EditDailyExpected',{
                 id:updatingId,
                 amount:updatingAmt,
                 name:editName
             })
             if(data.status==200){
-                fetching()
+            setShow(false)
+            fetching()
                 console.log('success ',data.message)
             }else{
                 // error
-                console.log('error ',data.message)
+            setAlertType('error')
+            console.log('error ',data.message)
             }
         }catch(err){
             // error
+            setAlertType('catch')
             console.log('error catch ',err.message)
         }
     }
@@ -168,8 +180,13 @@ const DailyExpense = () => {
         setOpen(true)
     }
 
+    const handler = ()=>{
+        setShow(false)
+    }
+
     return (
     <View style={styles.creditMain}>
+            <AlertComp  handler={handler} show={show} type={alertType} />
         <Header title={'Daily Expence'} />
         <EditModal setEditAmt={setUpdatingAmt} editAmt={updatingAmt}
         setEditName={setEditName} editName={editName}

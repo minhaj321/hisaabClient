@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import {View,Image,Animated,Text,ImageBackground,TextInput,Pressable,KeyboardAvoidingView} from 'react-native'
 import {heightPercentageToDP as hp , widthPercentageToDP as wp} from 'react-native-responsive-screen'
 import MsgIcon from './../assets/Message.svg';
@@ -21,43 +21,66 @@ const Login = ({navigation}) => {
     var translationYPass = new Animated.Value(hp(0))
     const [email,setEmail] = useState('')
     const [password,setPassword] = useState('')
+    const [type,setType] = useState('')
+    const [show,setShow] = useState(false)
+    
 
+    useEffect(()=>{
+        checking()
+    },[])
 
+    var checking = async()=>{
+        var userId = await AsyncStorage.getItem('userId');
+
+        if(userId){
+            navigation.navigate('Home')
+        }
+    }
 
     const handleLogin=async()=>{
-        if(email==''){
+        setShow(true)
+    setType('load')
+    if(email==''){
+            setType('email')
             return
         }else if(password==''){
+            setType('password')
             return
         }
         try{
         var {data} =await axios.post(dev+'/user/login',{
             email,password
         });
-        console.log(data)
         if(data.status==200){
+            setType('success')
             await AsyncStorage.setItem('userId',data.message.profile._id);
             await AsyncStorage.setItem('userInstanceId',data.message.userId);
             navigation.navigate('Home')
         }else if(data.status==403){
+            setType('success')
             navigation.navigate('ProfileBuilding',{
                 userId:data.message.id
             })
         }else{
+            setType(data.message)
             console.log('error',data.status)
         }
     }
 catch(err){
-    console.log(err.message)
+            setType('catch')
+            console.log(err.message)
     // errors
 }
     }
 
-    return (
+    const handler = ()=>{
+        setShow(false)
+    }
 
+    return (
         <KeyboardAvoidingView
         behavior='position' style={{backgroundColor:'#fdfdfd',height:'100%'}}>
-
+            <AlertComp  handler={handler} show={show} type={type} />
             {/* <Animated.View style={{marginTop:hp(4),transform:[{translateY:translationY},{scaleX:xScaling},{scaleY:yScaling}]}}> */}
 <ImageBackground source={HomeBg} style={{height:hp(25),width:wp(100),marginTop:hp(-5),marginBottom:hp(-2),transform:[{scaleY:0.8}]}} >
 <View style={{alignItems:'center',height:'100%',justifyContent:'center'}}>

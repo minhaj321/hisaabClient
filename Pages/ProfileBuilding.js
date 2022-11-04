@@ -15,6 +15,7 @@ import Woman4 from './../assets/woman4.png'
 import { dev } from '../Connections/endPoint.js';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AlertComp from './../Components/AlertComp';
 
 const ProfileBuilding = ({navigation,route}) => {
 
@@ -30,6 +31,8 @@ const ProfileBuilding = ({navigation,route}) => {
     const [salaryDate,setSalaryDate] = useState(1)
     const [startDate,setStartDate] = useState(1)
     const [profile,setProfile] = useState(0)
+    const [type,setType] = useState('')
+    const [show,setShow] = useState(false)
     const [render,setRender]= useState([
         {icon:Man1},
         {icon:Man2},
@@ -51,6 +54,10 @@ const ProfileBuilding = ({navigation,route}) => {
     ]
 
     const handleProfile = async()=>{
+        try{
+            setShow(true)
+            setType('load')
+
         var dob=day+'/'+month+'/'+year;
         var {data} = await axios.post(dev+'/user/buildProfile',{
             gender:male?'male':'female',
@@ -61,18 +68,28 @@ const ProfileBuilding = ({navigation,route}) => {
             dob,
             userId
         }) 
-        console.log(data)
         if(data.status==200){
+            setShow(false)
             await AsyncStorage.setItem('userId',data.message._id)
             navigation.navigate('Home')
     }else{
-            console.log("error",data.status)
+    setType('error')
+    console.log("error",data.status)
     }
+}catch(err){
+    setType('catch')
+            
+}
+
     }
 
+    const handler = ()=>{
+        setShow(false)
+    }
   return (
     <ScrollView style={{backgroundColor:'#fdfdfd'}}>
     <Header title={'Build Profile'} />
+    <AlertComp  handler={handler} show={show} type={type} />
 
                 <Text style={{...styles.extraTxt,marginTop:hp(10)}}>Salary</Text>
         <InputComp keyboardTypeNumber={true} focus={focused3} setFocus={setFocused3} val={salary} setVal={setSalary}  />

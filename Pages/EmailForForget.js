@@ -8,14 +8,20 @@ import { TextInput } from 'react-native';
 import axios from 'axios'
 import { useState } from 'react';
 import { dev } from '../Connections/endPoint';
+import AlertComp from './../Components/AlertComp';
 
 const EmailForForget = ({navigation}) => {
 
         const [email,setEmail] = useState('')
+        const [type,setType] = useState('')
+        const [show,setShow] = useState(false)
 
         const handleApi = async()=>{
+                setShow(true)
                 try{
+                        setType('load')
                         if(email==''){
+                        setType('error')
                         // error email
                                 return
                         }
@@ -23,21 +29,29 @@ const EmailForForget = ({navigation}) => {
                         email,
                 })
                 if(data.status==200){
-                        navigation.navigate('CodeOfReset',{
+                setShow(false)
+                navigation.navigate('CodeOfReset',{
                                 email
                         })
                 }else{
-                        // error else
+                setType('error')
+                // error else
                         // console.log("error",data.status)
                 }
         }catch(err){
+                setType('catch')
                 // error
         }
         }
 
+        const handler = ()=>{
+                setShow(false)
+            }
+
     return (
         <KeyboardAvoidingView
         behavior='position'style={{height:hp(100),backgroundColor:'#fdfdfd'}}>
+            <AlertComp  handler={handler} show={show} type={type} />
         <Header title={'Forget Password'} />
         <View style={{marginTop:hp(15)}}>
             <Text style={{color:'#333333',textAlign:'center',paddingHorizontal:wp(12),fontSize:wp(4.5)}}>Enter email to send code to change password.</Text>

@@ -11,6 +11,7 @@ import { dev } from '../Connections/endPoint';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EditModal from './../Components/EditModal.js';
 import moment from 'moment';
+import AlertComp from './../Components/AlertComp';
 
 const ExtraCredit = () => {
 
@@ -19,8 +20,6 @@ const ExtraCredit = () => {
     var [focused3,setFocused3] = useState(false)
     var [creditName,setCreditName] = useState('')
     var [creditAmt,setCreditAmt] = useState(0)
-    const [month, setMonth] = useState(0);
-    const [year, setYear] = useState(2022);
     const [date,setDate]=useState(moment().format('YYYY-MM-DD'))
     const [addOpen,setAddOpen] = useState(false);
     const [open,setOpen] = useState(false)
@@ -29,41 +28,41 @@ const ExtraCredit = () => {
     const [editId,setEditId] = useState('')
     const [editName,setEditName] = useState('')
     const [credits,setCredits] = useState([])
-    
+    const [type,setType] = useState('')
+    const [show,setShow] = useState(false)
+
     useEffect(()=>{
     fetching()
     },[])
 
     const fetching= async()=>{
+        setShow(true)
+        setType('load')
         try{
         var userId = await AsyncStorage.getItem('userId') 
         var {data} = await axios.get(dev+'/credit/readCredit/'+userId);
         if(data.status==200){
             // get data
-            // console.log('success=',data)
+        setShow(false)
+        // console.log('success=',data)
             setCredits(data.message)
         }else{
-            console.log('error=',data)
+        setType('error')
+        console.log('error=',data)
             // else error
         }
         }catch(err){
-            console.log('catch=',err.message)
+        setType('catch')
+        console.log('catch=',err.message)
             // error
         }
     }
 
-    var lst=[
-        {name:'Health Allowance',amt:'4,000', date :'04/Apr/2022'},
-        {name:'Birthday',amt:'300', date :'05/Apr/2022'},
-        {name:'Fuel Allowance',amt:'15,000', date :'06/Apr/2022'},
-        {name:'Birthday',amt:'300', date :'05/Apr/2022'},
-        {name:'Fuel Allowance',amt:'15,000', date :'06/May/2022'},
-        {name:'Health Allowance',amt:'4,000', date :'04/Jul/2022'},
-        {name:'Fuel Allowance',amt:'15,000', date :'06/Aug/2022'},
-    ]
 
 // add item handler
 const handleAdd =async ()=>{
+    setShow(true)
+    setType('load')
     try{
         var userId = await AsyncStorage.getItem('userId') 
         console.log(date)
@@ -74,29 +73,36 @@ const handleAdd =async ()=>{
             date
         }) 
         if(data.status==200){
-            console.log("done")
+        setShow(false)
+        console.log("done")
             fetching()
         }else{
             console.log("error ",data)
-        }
+        setType('error')
+    }
     }catch(err){
+        setType('catch')
         console.log("error ",err.message)
     }
 }
 
 // delete handler
 const handleDelete=async(eventId)=>{
+    setShow(true)
     try{
+        setType('load')
         var {data} = await axios.get(dev+'/credit/deleteCredit/'+eventId);
         if(data.status==200){
+        setShow(false)
         // success
-        console.log('deleted item')
         fetching();
         }else{
         console.log('error')
+        setType('error')
         // error
         }
     }catch(err){
+        setType('catch')
         console.log('catch ',err.message)
         // error
     }
@@ -112,34 +118,43 @@ const handleEdit = async(id,name,amt,date)=>{
         setOpen(true);
         
 }catch(err){
-        // error
+    // error
     }
     }
 
 // handleEditHandler
 const handleEditHandler=async()=>{
     try{
-        var {data} = await axios.post(dev+'/credit/editCredit',{
+        setType('load')
+        setShow(true)
+    var {data} = await axios.post(dev+'/credit/editCredit',{
             id:editId,
             name:editName,
             nextAmt:Number(editAmt),
             prevAmt:Number(prevAmt),
         })
         if(data.status==200){
-            console.log('editted,',data)
+            setShow(false)
             fetching()
         }else{
         console.log('err,',data)
-        }
+        setType('error')
+    }
     }catch(err){
         // error
+        setType('catch')
         console.log('err,',err.message)
     }
+}
+
+const handler = ()=>{
+    setShow(false)
 }
 
     return (
     <View style={styles.creditMain}>
         <Header title={'Extra Credits'} />
+            <AlertComp  handler={handler} show={show} type={type} />
         <EditModal setEditAmt={setEditAmt} editAmt={editAmt}
         setEditName={setEditName} editName={editName}
         handleEditHandler={handleEditHandler}
